@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class CalculatorViewController: UIViewController {
     
     // Create a new calculator to use
     private var calculator = CalculatorModel()
