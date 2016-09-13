@@ -55,6 +55,9 @@ class CalculatorModel {
     func setOperand(operand: Double){
         accumulator = operand
         internalProgram.append(operand)  // Add this double to the internal program to be recorded
+        if !isPartialResult {
+            updateDescription(String(operand), replace: false)
+        }
     }
     
     func setOperand(operand: String){
@@ -94,9 +97,6 @@ class CalculatorModel {
                     }
                 }
             }
-            
-            descriptionTracker.resetDescription = false
-            descriptionTracker.displayLastOperandInDescription = false
         }
     }
     
@@ -105,9 +105,7 @@ class CalculatorModel {
         accumulator = 0
         pendingOp = nil
         internalProgram.removeAll()
-        descriptionTracker.accumulatedDescription = ""
-        descriptionTracker.resetDescription = false
-        descriptionTracker.displayLastOperandInDescription = true
+        accumulatedDescription! = ""
     }
 
     private struct PendingBinaryOperation{
@@ -126,90 +124,56 @@ class CalculatorModel {
             
             switch operationToPerform {
             case .Constant(let value):
-                updateDescription(operation, clear: false) // add the constant to the description
-                descriptionTracker.displayLastOperandInDescription = false // because we're applying the constant, no need to have the binary operation include this
                 accumulator = value
+                if isPartialResult{
+                    updateDescription(operation, replace: false)
+                    omitAccumulatorFromDescription = true
+                }
             case .UnaryOperation(let function):
-                if isPartialResult {
-                    updateDescription(operation + "(\(accumulator))", clear: false)
-                    descriptionTracker.displayLastOperandInDescription = false
+                if isPartialResult{
+                    updateDescription("\(operation)(\(accumulator))", replace: false)
+                    omitAccumulatorFromDescription = true  // need to omit the accumulator if we want to keep modifying this.
                 } else {
-                    updateDescription(operation + "(\(description))", clear: true)
-                    descriptionTracker.displayLastOperandInDescription = false
-                    descriptionTracker.resetDescription = true  // resetDescription mechanism necessary to satisfy requirement (h) of assignment 1 (tricky stuff)
+                    updateDescription("\(operation)(\(accumulatedDescription!))", replace: true)
+                    clearDescription = true
                 }
                 accumulator = function(accumulator)
             case .BinaryOperation(let function):
                 
-                if isPartialResult{  // if the result is partial, we need to include the current accumulator value
-                    updateDescription(String(accumulator) + operation, clear: false)
-                }
-                    
-                else {  // if there is no operation underway, we just put the operation in the description (the accumulator will follow once selected)
-                    
-                    //handle weird case (h) of assignment 1
-                    if descriptionTracker.resetDescription{
-                        updateDescription("", clear: true)
-                        descriptionTracker.displayLastOperandInDescription = true
-                    }
-                    
-                    if descriptionTracker.displayLastOperandInDescription {
-                        updateDescription(String(accumulator) + " " + operation, clear: false)
+                // last change
+                if isPartialResult{
+                    if !omitAccumulatorFromDescription{
+                        updateDescription(String(accumulator) + operation, replace: false)
                     } else {
-                        updateDescription(operation, clear: false)
-                        descriptionTracker.displayLastOperandInDescription = true
+                        updateDescription(operation, replace: false)
                     }
+                } else {
+                    updateDescription(operation, replace: false)
                 }
+                
+                omitAccumulatorFromDescription = false
                 executePendingBinaryOperation()
                 pendingOp = PendingBinaryOperation(binaryFunction: function, firstOperand: accumulator, operation: operation)
             case .Equals:
- 
-                if descriptionTracker.displayLastOperandInDescription == true {  // in the case of a constant or unary the last operand doesn't need to be displayed when equals is pressed. Example: √(9) = instead of just 3. In this case, it should show the unary operation and operand instead of just the result...
-                    updateDescription(String(accumulator), clear: false)
-                }
-                
-                descriptionTracker.displayLastOperandInDescription = false
-                executePendingBinaryOperation()
-                
-            case .SetVar:
                 if isPartialResult{
-                    if descriptionTracker.displayLastOperandInDescription{  // in the case of a constant or unary, the last operand doesn't need to be displayed when equals is pressed. Example: √(9) = instead of just 3. In this case, it should show the unary operation and operand instead of just the result...
-                        updateDescription(String(accumulator), clear: false)
+                    if !omitAccumulatorFromDescription{
+                        updateDescription(String(accumulator), replace: false)
                     }
-                    
-                    // update - commented out
-//                    descriptionTracker.displayLastOperandInDescription = true
+                } else {
+                    accumulatedDescription! = accumulatedDescription!
                 }
-                
-                // added this for fun
-                descriptionTracker.displayLastOperandInDescription = true
-                
+                omitAccumulatorFromDescription = false
+                clearDescription = false
                 executePendingBinaryOperation()
-                
+            case .SetVar:
+                executePendingBinaryOperation()
                 // Remove the last element (this operation) before re-executing the program
-                // otherwise we'll get an infinite loop..
                 internalProgram.removeLast()
                 program = internalProgram
-                
             case .UseVar(let varName):
                 // Setting a string as the operand creates a variable.
-                var variableValue = 0.0
-                
-                if variableValues[varName] != nil {
-                    variableValue = variableValues[varName]!
-                }
-                
-                if descriptionTracker.resetDescription == true{
-                    updateDescription(String(varName), clear: true)
-                    descriptionTracker.displayLastOperandInDescription = false
-                    
-                } else {
-                    updateDescription(description + String(varName), clear: true)
-                    descriptionTracker.displayLastOperandInDescription = false
-                }
-                
+                let variableValue = variableValues[varName] ?? 0.0
                 accumulator = variableValue
-                
             case .Clear:
                 clear() // Clear the UI and program
                 variableValues.removeAll()  // clear any stored variables
@@ -243,34 +207,25 @@ class CalculatorModel {
         program = Array(newProgram) // need to case our new ArraySlice to an Array[AnyObject] to pass to program
     }
     
-    // MARK:  Methods and vars for description of operations/operands
+    // MARK: vars to manage description updates
+    private var accumulatedDescription: String? = ""
+    private var clearDescription = false
+    private var omitAccumulatorFromDescription = false
     
-    private struct CalcDescription {
-        // data structure to track the description displaying results of operations
-        private var accumulatedDescription: String?  // string used to display operations that have been performed
-        private var displayLastOperandInDescription: Bool  // provides logic to omit the last operand in some circumtances
-        private var resetDescription: Bool //flag used to have next operation reset the description
-    }
-    
-    private var descriptionTracker = CalcDescription(accumulatedDescription: "", displayLastOperandInDescription: true, resetDescription: false)
-    
-    private func updateDescription(update: String, clear: Bool){
-        // We need to clear and reset this to the update string
-        if clear {
-            descriptionTracker.accumulatedDescription = update
+    private func updateDescription(update: String, replace: Bool){
+        if clearDescription {
+            accumulatedDescription! = update
+            clearDescription = false
+        } else if replace {
+            accumulatedDescription! = update
         } else {
-            if descriptionTracker.accumulatedDescription == nil {
-                descriptionTracker.accumulatedDescription = update
-            } else {
-                descriptionTracker.accumulatedDescription! += " " + update
-            }
+            accumulatedDescription! = accumulatedDescription! + update
         }
-        print("accumulatedDescription: \(descriptionTracker.accumulatedDescription!)")
     }
-    
+
     var description: String {
         get {
-            if let current = descriptionTracker.accumulatedDescription {
+            if let current = accumulatedDescription {
                 return current
             } else {
                 return ""
