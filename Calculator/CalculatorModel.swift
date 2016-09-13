@@ -206,9 +206,6 @@ class CalculatorModel {
                 } else {
                     updateDescription(description + String(varName), clear: true)
                     descriptionTracker.displayLastOperandInDescription = false
-                    if isPartialResult{
-                        //descriptionTracker.displayLastOperandInDescription = false
-                    }
                 }
                 
                 accumulator = variableValue
@@ -232,14 +229,12 @@ class CalculatorModel {
     }
     
     var result: Double{
-        // This provides an API to get the current accumulator
         get {
             return accumulator
         }
     }
     
     func undo(){
-        //  This operates on the internalProgram array.
         //  When this method is called, the most recent operand or operation performed is removed from the record and the program is re-run to show the results as they existed before the last event
         print("Undo")
         print("old program: \(String(internalProgram))" )
