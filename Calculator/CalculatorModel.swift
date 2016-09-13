@@ -139,8 +139,6 @@ class CalculatorModel {
                 }
                 accumulator = function(accumulator)
             case .BinaryOperation(let function):
-                
-                // last change
                 if isPartialResult{
                     if !omitAccumulatorFromDescription{
                         updateDescription(String(accumulator) + operation, replace: false)
@@ -150,7 +148,6 @@ class CalculatorModel {
                 } else {
                     updateDescription(operation, replace: false)
                 }
-                
                 omitAccumulatorFromDescription = false
                 executePendingBinaryOperation()
                 pendingOp = PendingBinaryOperation(binaryFunction: function, firstOperand: accumulator, operation: operation)
@@ -170,10 +167,26 @@ class CalculatorModel {
                 // Remove the last element (this operation) before re-executing the program
                 internalProgram.removeLast()
                 program = internalProgram
+                clearDescription = false
             case .UseVar(let varName):
                 // Setting a string as the operand creates a variable.
                 let variableValue = variableValues[varName] ?? 0.0
+                
+//                if internalProgram.count > 1 {
+//                    let precedingItemInProgram = String(internalProgram.removeAtIndex(internalProgram.count - 2)) ?? ""
+//                    if precedingItemInProgram == varName {  // if we added an "M" right before this, remove it and disregard it
+//                        print(String(internalProgram))
+//                        print("Tried to use a variable too many times!")
+//                        if internalProgram.count > 1 {  // lolz hacky
+//                            internalProgram.removeLast()
+//                        }
+//                        break
+//                    }
+//                }
                 accumulator = variableValue
+                updateDescription(varName, replace: false)
+                omitAccumulatorFromDescription = true
+            
             case .Clear:
                 clear() // Clear the UI and program
                 variableValues.removeAll()  // clear any stored variables
@@ -207,7 +220,7 @@ class CalculatorModel {
         program = Array(newProgram) // need to case our new ArraySlice to an Array[AnyObject] to pass to program
     }
     
-    // MARK: vars to manage description updates
+    // MARK: Description
     private var accumulatedDescription: String? = ""
     private var clearDescription = false
     private var omitAccumulatorFromDescription = false
