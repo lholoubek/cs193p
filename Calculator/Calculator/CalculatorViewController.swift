@@ -95,12 +95,12 @@ class CalculatorViewController: UIViewController {
     @IBAction func provideFloat(sender: UIButton) {
         let dot = sender.currentTitle!
         let textDisplayed = display.text!
-        // If there's alread a "." displayed, ignore this
-        if textDisplayed.containsString(dot){
-            return
-        }
-        else if userIsTyping{
-            display.text = textDisplayed + dot
+        if userIsTyping{
+            if textDisplayed.containsString(dot){
+                return
+            } else {
+                display.text = textDisplayed + dot
+            }
         } else {
             display.text = dot
         }

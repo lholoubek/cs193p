@@ -102,7 +102,7 @@ class CalculatorModel {
     
     private func clear(){
         // Resets the calculator
-        accumulator = 0.0
+        accumulator = 0
         pendingOp = nil
         internalProgram.removeAll()
         descriptionTracker.accumulatedDescription = ""
@@ -144,6 +144,7 @@ class CalculatorModel {
                 if isPartialResult{  // if the result is partial, we need to include the current accumulator value
                     updateDescription(String(accumulator) + operation, clear: false)
                 }
+                    
                 else {  // if there is no operation underway, we just put the operation in the description (the accumulator will follow once selected)
                     
                     //handle weird case (h) of assignment 1
@@ -152,7 +153,7 @@ class CalculatorModel {
                         descriptionTracker.displayLastOperandInDescription = true
                     }
                     
-                    if descriptionTracker.displayLastOperandInDescription == true {
+                    if descriptionTracker.displayLastOperandInDescription {
                         updateDescription(String(accumulator) + " " + operation, clear: false)
                     } else {
                         updateDescription(operation, clear: false)
@@ -175,8 +176,13 @@ class CalculatorModel {
                     if descriptionTracker.displayLastOperandInDescription{  // in the case of a constant or unary, the last operand doesn't need to be displayed when equals is pressed. Example: √(9) = instead of just 3. In this case, it should show the unary operation and operand instead of just the result...
                         updateDescription(String(accumulator), clear: false)
                     }
-                    descriptionTracker.displayLastOperandInDescription = true
+                    
+                    // update - commented out
+//                    descriptionTracker.displayLastOperandInDescription = true
                 }
+                
+                // added this for fun
+                descriptionTracker.displayLastOperandInDescription = true
                 
                 executePendingBinaryOperation()
                 
