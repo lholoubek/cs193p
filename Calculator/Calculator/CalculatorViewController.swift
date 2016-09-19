@@ -20,10 +20,11 @@ class CalculatorViewController: UIViewController {
         }
         
         print("Transitioning to graph")
-////        if let graphViewController = destinationvc as? GraphViewController {
-////            print("going to send program: \(String(calculator.program))")
+        if let graphViewController = destinationvc as? GraphViewController {
+            print("going to send program: \(String(calculator.program))")
 //            graphViewController.vcProgram = calculator.program as! [AnyObject]
-////        }
+            graphViewController.vcProgram = calculator.program as! [AnyObject]
+        }
     }
 
     // Create a new calculator to use from the associated model
