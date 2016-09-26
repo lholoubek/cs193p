@@ -117,6 +117,7 @@
 					7FDB3FCC1D79415A00AFA686 = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = 63UW99GP28;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -283,6 +284,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.lukeholoubek.Calculator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -297,6 +299,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.lukeholoubek.Calculator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};

@@ -14,45 +14,52 @@ class GraphView: UIView {
 
     override func drawRect(rect: CGRect) {
         // If graphOrigin has not been set, initialize it to the center of the bounds
-        // NOTE: We have to do this here because bounds aren't available until now
-        if graphOrigin == nil {
-            graphOrigin = CGPoint(x: bounds.midX, y: bounds.midY)
-        }
+        // NOTE: We have to do this here because bounds aren't available until we're inside the drawRect
+        let origin = graphOrigin ?? CGPoint(x: bounds.midX, y: bounds.midY)
         
-        if valFromPixel != nil {
-            print("Here's where we'll use the valFromPixel function provided by the controller...")
-        }
-        
-        //contentScaleFactor isn't available until now
+        //draw the axes using the AxesDrawer class
         drawer.contentScaleFactor = contentScaleFactor
-        drawer.drawAxesInRect(bounds, origin: graphOrigin!, pointsPerUnit: graphScale)
+        drawer.drawAxesInRect(bounds, origin: origin, pointsPerUnit: graphScale)
+        
+        // Draw the graph
+        if getYPointFromPixel != nil {
+        // iterate over pixel and if valid, draw a line to it
+            let widthInPixels = bounds.width*contentScaleFactor
+            var previousPoint: CGPoint?
+            
+            for pixel in 0...Int(widthInPixels){
+                if previousPoint != nil {
+                    let path = UIBezierPath()
+                    path.moveToPoint(previousPoint!)
+                    if let newPoint = getYPointFromPixel!(pixel: pixel, origin: origin) {
+                        print("NewPoint: \(newPoint)")
+                        path.addLineToPoint(newPoint)
+                        path.lineWidth = CGFloat(1.0)
+                        path.stroke()
+                        previousPoint = newPoint
+                    }
+                } else {
+                    if let newPoint = getYPointFromPixel!(pixel: pixel, origin: origin){
+                        previousPoint = newPoint
+                    }
+                }
+            }
+            
+            
+        }
+        
+        
     }
     
     @IBInspectable
-    var graphOrigin: CGPoint?{
-        didSet {
-            setNeedsDisplay()
-        }
-    }
+    var graphOrigin: CGPoint?{ didSet {setNeedsDisplay() } }
     
     @IBInspectable
     var graphScale: CGFloat = 37.0 { didSet{ setNeedsDisplay() } }
     
     //MARK: Public API
-    // Optional function to call when drawing to return a value for the passed pixel
-    var valFromPixel: ((Int) -> (Float))?
-    
-    struct AxisValues {
-        var max: Float
-        var min: Float
-    }
-    
-    var xAxisVals: AxisValues {
-        let maxX = Float(bounds.maxX)/2
-        let minX = 0 - (Float(bounds.maxX)/2)
-        return AxisValues(max: maxX/Float(graphScale), min: minX/Float(graphScale))
-    }
-    
+    // Optional function to call when drawing to return a y axes point for the passed pixel
+    var getYPointFromPixel: ((pixel: Int, origin: CGPoint) -> (CGPoint?))?
     
     // MARK: Gesture Handlers
     func changeScale(recognizer: UIPinchGestureRecognizer) {
@@ -66,12 +73,14 @@ class GraphView: UIView {
     }
     
     func changeOrigin(recognizer: UIPanGestureRecognizer){
+        let currentOrigin = graphOrigin ?? CGPoint(x: bounds.midX, y: bounds.midY)
+
         switch recognizer.state{
         case .Changed, .Ended:
             let translation = recognizer.translationInView(self)
             var newOrigin = CGPoint()
-            newOrigin.x = graphOrigin!.x + translation.x
-            newOrigin.y = graphOrigin!.y + translation.y
+            newOrigin.x = currentOrigin.x + translation.x
+            newOrigin.y = currentOrigin.y + translation.y
             recognizer.setTranslation(CGPoint(x: 0.0, y: 0.0), inView: self)
             graphOrigin = newOrigin
         default:
@@ -80,14 +89,5 @@ class GraphView: UIView {
     }
     
     let drawer = AxesDrawer(color: UIColor.blueColor())
-    
-    func drawAxes(){
-        setNeedsDisplay()
-    }
-    
-    
-    
-    
-    
     
 }

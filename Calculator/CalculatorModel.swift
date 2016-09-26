@@ -13,14 +13,15 @@ class CalculatorModel {
     
     private var accumulator = 0.0
     
-    private var internalProgram = [AnyObject](){// Creating an array with mixes of Doubles and Strings
-        didSet {
-            if internalProgram.count > 0 {
-                print("added to internal program: \(internalProgram[internalProgram.count - 1])")
-            }
-            print("New internal program: \(String(internalProgram))")
-        }
-    }
+    private var internalProgram = [AnyObject]()
+//        {
+//        didSet {
+//            if internalProgram.count > 0 {
+//                print("added to internal program: \(internalProgram[internalProgram.count - 1])")
+//            }
+//            print("New internal program: \(String(internalProgram))")
+//        }
+//    }
     
     private var operations: Dictionary<String, Operation> = [
         // Key/value store to store known operations and associate enums (containing values as needed)
@@ -64,11 +65,12 @@ class CalculatorModel {
         performOperations(operand)
     }
     
-    var variableValues = Dictionary<String, Double>(){
-        didSet{
-            print("variableValues updated: \(String(variableValues))")
-        }
-    }
+    var variableValues = Dictionary<String, Double>()
+//        {
+//        didSet{
+//            print("variableValues updated: \(String(variableValues))")
+//        }
+//    }
 
     private var pendingOp: PendingBinaryOperation?
     
@@ -213,10 +215,7 @@ class CalculatorModel {
     
     func undo(){
         //  When this method is called, the most recent operand or operation performed is removed from the record and the program is re-run to show the results as they existed before the last event
-        print("Undo")
-        print("old program: \(String(internalProgram))" )
         let newProgram = internalProgram.dropLast()
-        print("New program: \(String(newProgram))")
         program = Array(newProgram) // need to case our new ArraySlice to an Array[AnyObject] to pass to program
     }
     
