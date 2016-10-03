@@ -32,7 +32,6 @@ class GraphView: UIView {
                     let path = UIBezierPath()
                     path.moveToPoint(previousPoint!)
                     if let newPoint = getYPointFromPixel!(pixel: pixel, origin: origin) {
-                        print("NewPoint: \(newPoint)")
                         path.addLineToPoint(newPoint)
                         path.lineWidth = CGFloat(1.0)
                         path.stroke()

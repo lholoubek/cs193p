@@ -48,7 +48,7 @@ class RecordingListViewController: UIViewController {
 
 extension RecordingListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        print("selected : \(indexPath)")
     }
     
 }
@@ -67,5 +67,6 @@ extension RecordingListViewController: UITableViewDataSource {
         cell.textLabel?.text = document
         return cell
     }
+
 }
 

@@ -8,6 +8,8 @@
 
 import UIKit
 
+var grapherCount = 0
+
 class GraphViewController: UIViewController {
     
     @IBOutlet weak var middleLabel: UILabel!
@@ -32,6 +34,8 @@ class GraphViewController: UIViewController {
         print(graphCalculator.result)
         middleLabel.text = "Result: \(String(graphCalculator.description))"
         graphView.getYPointFromPixel = getYPointFromPixel
+        grapherCount += 1
+        print("Number of Graphers: \(grapherCount)")
     }
     
     private let graphCalculator = CalculatorModel()
@@ -55,7 +59,6 @@ class GraphViewController: UIViewController {
             portionOfValsOnSideOfOrigin = distFromOriginInPixels/(Float(numPixels) - originInPixels)
             pixelValue = portionOfValsOnSideOfOrigin * positiveVals
         }
-        print("Pixel value: \(pixelValue)")
         
         graphCalculator.variableValues["M"] = Double(pixelValue)
         graphCalculator.performOperations("→M")
@@ -72,8 +75,7 @@ class GraphViewController: UIViewController {
 //        let totalPixels = graphView.bounds.maxY * graphView.contentScaleFactor
         
         var returnVal: CGPoint? = nil
-        
-        print("yvalue: \(yValue)")
+  
         
         let totalValues = graphView.bounds.maxY/graphView.graphScale
         let positiveVals = (origin.y/graphView.bounds.maxY) * totalValues
