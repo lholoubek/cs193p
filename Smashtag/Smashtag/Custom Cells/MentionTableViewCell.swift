@@ -10,6 +10,13 @@ import UIKit
 
 class MentionTableViewCell: UITableViewCell {
 
-  
+    var mentionData: String? {
+        didSet{
+             mentionLabel.text? = mentionData!
+            print("Mention data: \(mentionData)")
+        }
+    }
+    
+    @IBOutlet weak var mentionLabel: UILabel!
 
 }

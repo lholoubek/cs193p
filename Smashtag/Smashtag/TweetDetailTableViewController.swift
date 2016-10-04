@@ -16,37 +16,68 @@ class TweetDetailTableViewController: UITableViewController {
 
     }
     
-    var tweet: Twitter.Tweet?
-    
     var tweetDetail: TweetDetail?
    
     // MARK: - Table view data source
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        let numSections = tweetDetail?.numSections ?? 0
+        return numSections
+        
     }
-
+    
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        if let details = tweetDetail {
-            return details.sections.count
-        } else {
-            return 0
-        }
+        let section = tweetDetail?.sections[section]
+        return tweetDetail?.data[section!]!.count ?? 0
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if let details = tweetDetail {
-            return details.sections[section]
+        let numSections = tweetDetail?.numSections
+        if numSections != 0 {
+            return tweetDetail?.sections[section] ?? ""
         } else {
-            return ""
+         return ""
         }
     }
     
-    func tableView(tableView: UITableView, cellForRowAt indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-        let cell = UITableViewCell(style: .Default, reuseIdentifier: "default")
-        cell.textLabel?.text = "hooray"
+        print("TABLE LOCATION: section-\(indexPath.section)  row-\(indexPath.row) ")
+
+        var identifier: String
+        
+        let section = tweetDetail?.sections[indexPath.section]
+        
+        let mentionType = tweetDetail?.data[section!]![indexPath.row]
+        
+        print("MENTION TYPE: \(mentionType!)")
+        
+        
+        var myString: String? = ""
+        var myUrl: NSURL? = NSURL(string: "")
+        
+        switch mentionType! {
+        case .Hashtag(let data):
+            identifier = "Mention"
+            myString = data
+        case .Url(let data):
+            identifier = "Mention"
+            myString = data
+        case .User(let data):
+            identifier = "Mention"
+            myString = data
+        case .Image(let data):
+            identifier = "Image"
+            myUrl = data
+        }
+        
+        let cell = tableView.dequeueReusableCellWithIdentifier(identifier, forIndexPath: indexPath)
+        if let myCell = cell as? MentionTableViewCell{
+            myCell.mentionData = myString!
+        } else if let myCell = cell as? ImageViewCell{
+            myCell.url = myUrl
+        }
         return cell
     }
+    
+
 }

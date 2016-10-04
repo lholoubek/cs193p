@@ -132,7 +132,9 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
                     let detailViewController = segue.destinationViewController as? TweetDetailTableViewController{
                     print("SEGUEING - ")
                     let tweet = tweets[indexPath.section][indexPath.row]
-                    detailViewController.tweet = tweet
+                    let tweetDetail = tweetDetailFromTweet(tweet)
+                    print("TWEET DETAIL---- \(tweetDetail)")
+                    detailViewController.tweetDetail = tweetDetail
                 }
             default:
                 break
