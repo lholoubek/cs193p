@@ -26,7 +26,7 @@
                                 <rect key="frame" x="0.0" y="122" width="375" height="154"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="k1M-Tv-biK" id="EYs-gE-X6M">
-                                    <frame key="frameInset" width="375" height="153.5"/>
+                                    <frame key="frameInset" width="375" height="154"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="PyJ-y5-pCT">
@@ -123,24 +123,35 @@
                                 <rect key="frame" x="0.0" y="92" width="375" height="156"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="JsH-HB-gSI" id="PIy-Nh-5tc">
-                                    <frame key="frameInset" width="375" height="155.5"/>
+                                    <frame key="frameInset" width="375" height="156"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="L4X-8E-LHW">
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="L4X-8E-LHW">
                                             <frame key="frameInset" minY="-6" width="375" height="169"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         </imageView>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="x9O-ye-5DD"/>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="L4X-8E-LHW" secondAttribute="trailing" id="4Qp-UU-Fkx"/>
+                                        <constraint firstItem="L4X-8E-LHW" firstAttribute="top" secondItem="PIy-Nh-5tc" secondAttribute="top" id="8EY-r4-bip"/>
+                                        <constraint firstItem="L4X-8E-LHW" firstAttribute="leading" secondItem="PIy-Nh-5tc" secondAttribute="leading" id="EcA-7I-3dm"/>
+                                        <constraint firstItem="x9O-ye-5DD" firstAttribute="leading" secondItem="PIy-Nh-5tc" secondAttribute="leadingMargin" constant="169" id="Har-vS-hce"/>
+                                        <constraint firstAttribute="bottom" secondItem="L4X-8E-LHW" secondAttribute="bottom" id="NuL-ft-EJX"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="x9O-ye-5DD" secondAttribute="trailing" constant="170" id="SZd-yX-1g5"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="x9O-ye-5DD" secondAttribute="bottom" constant="60" id="ZeD-r3-PsB"/>
+                                        <constraint firstItem="x9O-ye-5DD" firstAttribute="top" secondItem="PIy-Nh-5tc" secondAttribute="topMargin" constant="60" id="tZG-xV-WA1"/>
+                                    </constraints>
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="imageCellImage" destination="L4X-8E-LHW" id="kq3-Kq-vdE"/>
+                                    <outlet property="spinner" destination="x9O-ye-5DD" id="QgE-Ae-2OO"/>
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Mention" rowHeight="41" id="8C2-WU-QI1" customClass="MentionTableViewCell" customModule="Smashtag" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="248" width="375" height="41"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="8C2-WU-QI1" id="aTe-2n-afY">
-                                    <frame key="frameInset" width="375" height="40.5"/>
+                                    <frame key="frameInset" width="375" height="41"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cZe-ux-4gR">
@@ -162,6 +173,9 @@
                             <outlet property="delegate" destination="5Yl-iY-cKe" id="OHZ-by-IWV"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <outlet property="tableView" destination="Rav-ll-leS" id="1j8-at-tNv"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xfL-o1-VxX" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

@@ -10,12 +10,9 @@ import UIKit
 
 class ImageViewCell: UITableViewCell {
     
-    var url: NSURL? {
-        didSet{
-            print("URL: \(url)")
-        }
-    }
+    @IBOutlet weak var spinner: UIActivityIndicatorView!
     
     @IBOutlet weak var imageCellImage: UIImageView!
+
     
 }
