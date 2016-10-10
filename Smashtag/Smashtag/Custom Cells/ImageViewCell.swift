@@ -12,7 +12,12 @@ class ImageViewCell: UITableViewCell {
     
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     
-    @IBOutlet weak var imageCellImage: UIImageView!
-
+    @IBOutlet weak var tweetDetailImageView: UIImageView!
+    
+    var detailImage: UIImage? {
+        didSet{
+            tweetDetailImageView.image = detailImage
+        }
+    }
     
 }

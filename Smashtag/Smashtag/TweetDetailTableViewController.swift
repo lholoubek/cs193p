@@ -20,8 +20,8 @@ class TweetDetailTableViewController: UITableViewController {
         
         for url in imageUrls {
             switch url {
-            case .Image(let url):
-                getImage(url)
+            case .Image(let data):
+                getImage(data.url)
             default:
                 break
             }
@@ -31,15 +31,14 @@ class TweetDetailTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
     }
     
     //MARK: Public API
     var tweetDetail: TweetDetail?
     
-    
     //MARK: Private API
-    var images = [UIImage]() {
+    private var images = [UIImage]() {
         didSet{
             // If images have arrived, update the tableview to include the new images
             tableView.reloadData()
@@ -51,17 +50,36 @@ class TweetDetailTableViewController: UITableViewController {
         // Gets the URL from the tweetDetail
         
         print("GETTING URGL: \(url)")
+        // Send this request to a background queue
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) { [weak self] in
             if let imageData = NSData(contentsOfURL: url) {
                 if let image = UIImage(data: imageData){
+                    // we have the image data as a valid UIImage; send this back to the main thread to drop in the view
                     dispatch_async(dispatch_get_main_queue(), {
                         self?.images.append(image)
                     })
                 }
             }
         }
-        
     }
+    
+    
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let identifer = segue.identifier {
+            switch identifer{
+                case "ToImageDetail":
+                    if let cell = sender as? ImageViewCell, let indexPath = tableView.indexPathForCell(cell), imageViewDetailController = segue.destinationViewController as? ImageDetailViewController {
+                        print("Segue to image detail view...")
+                        let image = images[indexPath.row]
+                        imageViewDetailController.image = image
+                }
+            default:
+                break
+            }
+        }
+    }
+    
 }
 
 
@@ -113,7 +131,8 @@ extension TweetDetailTableViewController {
             myString = data
         case .Image(let data):
             identifier = "Image"
-            myUrl = data
+            myUrl = data.url
+            let aspectRatio = data.aspectRatio
         }
         
         let cell = tableView.dequeueReusableCellWithIdentifier(identifier, forIndexPath: indexPath)
@@ -124,7 +143,7 @@ extension TweetDetailTableViewController {
             if images.count > indexPath.row {
                 myCell.spinner.stopAnimating()
                 let image = images[indexPath.row]
-                myCell.imageView?.image = image
+                myCell.tweetDetailImageView.image = image
             } else {
                 myCell.spinner.startAnimating()
             }
@@ -134,25 +153,27 @@ extension TweetDetailTableViewController {
 }
 
 
-
 //MARK: Table view delegate methods
 extension TweetDetailTableViewController {
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         let section = tweetDetail?.sections[indexPath.section]
         let tweet = tweetDetail?.data[section!]?[indexPath.row]
+        
         switch tweet! {
-        case .Image:
+        case .Image(let data):
             // If this is an image, make the cell 200pts by default
-            return CGFloat(200.0)
+            let width = view.frame.size.width
+            let height = width / CGFloat(data.aspectRatio!)
+            return height
         default:
             // Otherwise constrain it automatically to the size of the text
             return CGFloat(UITableViewAutomaticDimension)
         }
+        
+        
     }
 }
-
-
 
 
 

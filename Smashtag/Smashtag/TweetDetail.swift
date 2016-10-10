@@ -10,7 +10,7 @@ import Foundation
 import Twitter
 
 enum MentionType{
-    case Image(NSURL)
+    case Image(TweetImage)
     case Url(String)
     case Hashtag(String)
     case User(String)
@@ -25,6 +25,11 @@ struct TweetDetail {
     var user: String
 }
 
+struct TweetImage {
+    var url: NSURL
+    var aspectRatio: Double?
+}
+
 func tweetDetailFromTweet(tweet: Twitter.Tweet) -> TweetDetail {
     // Converts an instance of the Tweet class into a TweetDetail object for use in the TweetDetailView
     var tweetDetail = TweetDetail(sections: [String](), data: [String : [MentionType]](), user: tweet.user.screenName)
@@ -33,7 +38,8 @@ func tweetDetailFromTweet(tweet: Twitter.Tweet) -> TweetDetail {
     if tweet.media.count > 0 {
         tweetDetail.sections.append("images")
         tweetDetail.data["images"] = tweet.media.map({(media: Twitter.MediaItem) -> MentionType in
-            return MentionType.Image(media.url)
+            let tweetImage = TweetImage(url: media.url, aspectRatio: media.aspectRatio)
+            return MentionType.Image(tweetImage)
         })
     }
     
@@ -63,4 +69,39 @@ func tweetDetailFromTweet(tweet: Twitter.Tweet) -> TweetDetail {
     
     return tweetDetail
 }
+
+
+func attributedStringFromTweet(tweet: Twitter.Tweet) -> NSAttributedString {
+    let attributedString = NSMutableAttributedString(string: tweet.text)
+    let fullString = tweet.text as NSString
     
+    let hashtagAttributes = [NSForegroundColorAttributeName: UIColor.greenColor()]
+    let urlAttributes = [NSForegroundColorAttributeName: UIColor.blueColor()]
+    let userAttributes = [NSForegroundColorAttributeName: UIColor.orangeColor()]
+    
+    // Turn the hashtags red
+    for hashtag in tweet.hashtags {
+        let charRange = fullString.rangeOfString(hashtag.keyword)
+        attributedString.addAttributes(hashtagAttributes, range: charRange)
+    }
+    
+    for url in tweet.urls {
+        let charRange = fullString.rangeOfString(url.keyword)
+        attributedString.addAttributes(urlAttributes, range: charRange)
+    }
+    
+    for userMention in tweet.userMentions {
+        let charRange = fullString.rangeOfString(userMention.keyword)
+        attributedString.addAttributes(userAttributes, range: charRange)
+    }
+    
+    return attributedString
+    
+}
+
+
+
+
+
+
+

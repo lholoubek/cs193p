@@ -13,7 +13,11 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
 {
     // MARK: Model
 
-    var tweets = [Array<Twitter.Tweet>]() {
+//    var tweets = [Array<Twitter.Tweet>]()
+//    var tweets = [[Twitter.Tweet]]
+    
+    var tweets: [[Twitter.Tweet]] = [[]]
+    {
         didSet {
             tableView.reloadData()
         }
@@ -66,9 +70,9 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
     
     // MARK: UITableViewDataSource
 
-    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "\(tweets.count - section)"
-    }
+//    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+//        return "\(tweets.count - section)"
+//    }
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return tweets.count

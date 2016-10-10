@@ -9,6 +9,7 @@
 import UIKit
 import Twitter
 
+
 class TweetTableViewCell: UITableViewCell
 {
     @IBOutlet weak var tweetScreenNameLabel: UILabel!
@@ -33,7 +34,7 @@ class TweetTableViewCell: UITableViewCell
         // load new information from our tweet (if any)
         if let tweet = self.tweet
         {
-            tweetTextLabel?.text = tweet.text
+            tweetTextLabel?.attributedText = attributedStringFromTweet(tweet)
             if tweetTextLabel?.text != nil  {
                 for _ in tweet.media {
                     tweetTextLabel.text! += " 📷"
@@ -43,9 +44,14 @@ class TweetTableViewCell: UITableViewCell
             tweetScreenNameLabel?.text = "\(tweet.user)" // tweet.user.description
             
             if let profileImageURL = tweet.user.profileImageURL {
-                if let imageData = NSData(contentsOfURL: profileImageURL) { // blocks main thread!
-                    tweetProfileImageView?.image = UIImage(data: imageData)
+                dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) { [weak self] in
+                    if let imageData = NSData(contentsOfURL: profileImageURL) {
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self?.tweetProfileImageView?.image = UIImage(data: imageData)
+                        }
+                    }
                 }
+                
             }
             
             let formatter = NSDateFormatter()
