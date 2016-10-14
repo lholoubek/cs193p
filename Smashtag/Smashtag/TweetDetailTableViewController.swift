@@ -63,8 +63,6 @@ class TweetDetailTableViewController: UITableViewController {
         }
     }
     
-    
-    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let identifer = segue.identifier {
             switch identifer{
@@ -74,12 +72,19 @@ class TweetDetailTableViewController: UITableViewController {
                         let image = images[indexPath.row]
                         imageViewDetailController.image = image
                 }
+                case "ToMentionSearch":
+                    if let tweetTableViewController = segue.destinationViewController as? TweetTableViewController {
+                        print("Segue to tweet search view...")
+                        if let cell = sender as? MentionTableViewCell {
+                            guard let text = cell.mentionData else {return}
+                            tweetTableViewController.searchText = text
+                        }
+                }
             default:
                 break
             }
         }
     }
-    
 }
 
 
@@ -170,8 +175,23 @@ extension TweetDetailTableViewController {
             // Otherwise constrain it automatically to the size of the text
             return CGFloat(UITableViewAutomaticDimension)
         }
+    }
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        // NOTE: we only need to handle the browser view case here. If we're transitioning to the image detail or mention search, that's handled above via segues.
         
+        guard let mentionType = tweetDetail?.data[((tweetDetail?.sections[indexPath.section]))!]![indexPath.row] else {return}
         
+        switch mentionType {
+        case .Url(let data):
+            if let url = NSURL(string: data){
+                UIApplication.sharedApplication().openURL(url, options: [:], completionHandler: {(Bool) in
+                return true})
+            }
+        default:
+            break
+            
+        }
     }
 }
 
