@@ -34,7 +34,7 @@ class TweetTableViewCell: UITableViewCell
         // load new information from our tweet (if any)
         if let tweet = self.tweet
         {
-            tweetTextLabel?.attributedText = attributedStringFromTweet(tweet)
+            tweetTextLabel?.attributedText = attributedStringFromTweet(tweet: tweet)
             if tweetTextLabel?.text != nil  {
                 for _ in tweet.media {
                     tweetTextLabel.text! += " 📷"
@@ -44,23 +44,25 @@ class TweetTableViewCell: UITableViewCell
             tweetScreenNameLabel?.text = "\(tweet.user)" // tweet.user.description
             
             if let profileImageURL = tweet.user.profileImageURL {
-                dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) { [weak self] in
-                    if let imageData = NSData(contentsOfURL: profileImageURL) {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            self?.tweetProfileImageView?.image = UIImage(data: imageData)
+                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                    if let imageData = NSData(contentsOf: profileImageURL as URL) {
+                        DispatchQueue.main.async {
+                            self?.tweetProfileImageView?.image = UIImage(data: imageData as Data)
                         }
                     }
                 }
                 
             }
             
-            let formatter = NSDateFormatter()
-            if NSDate().timeIntervalSinceDate(tweet.created) > 24*60*60 {
-                formatter.dateStyle = NSDateFormatterStyle.ShortStyle
-            } else {
-                formatter.timeStyle = NSDateFormatterStyle.ShortStyle
-            }
-            tweetCreatedLabel?.text = formatter.stringFromDate(tweet.created)
+            let formatter = DateFormatter()
+//
+//            if Date().timeIntervalSince: tweet.created) > 24*60*60 {
+//                formatter.dateStyle = CFDateFormatterStyle.ShortStyle
+//            } else {
+//                formatter.timeStyle = CFDateFormatterStyle.ShortStyle
+//            }
+            
+            tweetCreatedLabel?.text = formatter.string(from: tweet.created as Date)
         }
 
     }

@@ -24,9 +24,9 @@ public class User: NSObject
     
     init?(data: NSDictionary?) {
         guard
-            let screenName = data?.valueForKeyPath(TwitterKey.ScreenName) as? String,
-            let name = data?.valueForKeyPath(TwitterKey.Name) as? String,
-            let id = data?.valueForKeyPath(TwitterKey.ID) as? String
+            let screenName = data?.value(forKeyPath: TwitterKey.ScreenName) as? String,
+            let name = data?.value(forKeyPath: TwitterKey.Name) as? String,
+            let id = data?.value(forKeyPath: TwitterKey.ID) as? String
         else {
             return nil
         }
@@ -35,18 +35,18 @@ public class User: NSObject
         self.name = name
         self.id = id
 
-        self.verified = data?.valueForKeyPath(TwitterKey.Verified)?.boolValue ?? false
-        let urlString = data?.valueForKeyPath(TwitterKey.ProfileImageURL) as? String ?? ""
+        self.verified = (data?.value(forKeyPath: TwitterKey.Verified) as AnyObject).boolValue ?? false
+        let urlString = data?.value(forKeyPath: TwitterKey.ProfileImageURL) as? String ?? ""
         self.profileImageURL = (urlString.characters.count > 0) ? NSURL(string: urlString) : nil
     }
     
-    var asPropertyList: AnyObject {
+    var asPropertyList: [String:AnyObject] {
         return [
-            TwitterKey.Name:name,
-            TwitterKey.ScreenName:screenName,
-            TwitterKey.ID:id,
-            TwitterKey.Verified:verified ? "YES" : "NO",
-            TwitterKey.ProfileImageURL:profileImageURL?.absoluteString ?? ""
+            TwitterKey.Name:name as AnyObject,
+            TwitterKey.ScreenName:screenName as AnyObject,
+            TwitterKey.ID:id as AnyObject,
+            TwitterKey.Verified:verified ? "YES" as AnyObject : "NO" as AnyObject,
+            TwitterKey.ProfileImageURL:profileImageURL?.absoluteString as AnyObject? ?? "" as AnyObject
         ]
     }
     

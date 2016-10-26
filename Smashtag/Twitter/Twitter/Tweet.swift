@@ -32,10 +32,10 @@ public class Tweet : NSObject
     init?(data: NSDictionary?)
     {
         guard
-            let user = User(data: data?.valueForKeyPath(TwitterKey.User) as? NSDictionary),
-            let text = data?.valueForKeyPath(TwitterKey.Text) as? String,
-            let created = (data?.valueForKeyPath(TwitterKey.Created) as? String)?.asTwitterDate,
-            let id = data?.valueForKeyPath(TwitterKey.ID) as? String
+            let user = User(data: data?.value(forKeyPath: TwitterKey.User) as? NSDictionary),
+            let text = data?.value(forKeyPath: TwitterKey.Text) as? String,
+            let created = (data?.value(forKeyPath: TwitterKey.Created) as? String)?.asTwitterDate,
+            let id = data?.value(forKeyPath: TwitterKey.ID) as? String
         else {
             return nil
         }
@@ -45,10 +45,10 @@ public class Tweet : NSObject
         self.created = created
         self.id = id
 
-        self.media = Tweet.mediaItemsFromTwitterData(data?.valueForKeyPath(TwitterKey.Media) as? NSArray)
-        self.hashtags = Tweet.mentionsFromTwitterData(data?.arrayForKeyPath(TwitterKey.Entities.Hashtags), inText: text, withPrefix: "#")
-        self.urls = Tweet.mentionsFromTwitterData(data?.arrayForKeyPath(TwitterKey.Entities.URLs), inText: text, withPrefix: "http")
-        self.userMentions = Tweet.mentionsFromTwitterData(data?.arrayForKeyPath(TwitterKey.Entities.UserMentions), inText: text, withPrefix: "@")
+        self.media = Tweet.mediaItemsFromTwitterData(twitterData: data?.value(forKeyPath: TwitterKey.Media) as? NSArray)
+        self.hashtags = Tweet.mentionsFromTwitterData(twitterData: data?.arrayForKeyPath(keypath: TwitterKey.Entities.Hashtags), inText: text, withPrefix: "#")
+        self.urls = Tweet.mentionsFromTwitterData(twitterData: data?.arrayForKeyPath(keypath: TwitterKey.Entities.URLs), inText: text, withPrefix: "http")
+        self.userMentions = Tweet.mentionsFromTwitterData(twitterData: data?.arrayForKeyPath(keypath: TwitterKey.Entities.UserMentions), inText: text, withPrefix: "@")
     }
     
     private static func mediaItemsFromTwitterData(twitterData: NSArray?) -> [MediaItem] {
@@ -64,7 +64,7 @@ public class Tweet : NSObject
     private static func mentionsFromTwitterData(twitterData: NSArray?, inText text: String, withPrefix prefix: String) -> [Mention] {
         var mentions = [Mention]()
         for mentionData in twitterData ?? [] {
-            if let mention = Mention(fromTwitterData: mentionData as? NSDictionary, inText: text, withPrefix: prefix) {
+            if let mention = Mention(fromTwitterData: mentionData as? NSDictionary, inText: text as NSString, withPrefix: prefix) {
                 mentions.append(mention)
             }
         }
@@ -97,45 +97,45 @@ public class Mention: NSObject
     init?(fromTwitterData data: NSDictionary?, inText text: NSString, withPrefix prefix: String)
     {
         guard
-            let indices = data?.valueForKeyPath(Tweet.TwitterKey.Entities.Indices) as? NSArray,
-            let start = (indices.firstObject as? NSNumber)?.integerValue where start >= 0,
-            let end = (indices.lastObject as? NSNumber)?.integerValue where end > start
+            let indices = data?.value(forKeyPath: Tweet.TwitterKey.Entities.Indices) as? NSArray,
+            let start = (indices.firstObject as? NSNumber)?.intValue , start >= 0,
+            let end = (indices.lastObject as? NSNumber)?.intValue , end > start
             else {
                 return nil
         }
         
         var prefixAloneOrPrefixedMention = prefix
-        if let mention = data?.valueForKeyPath(Tweet.TwitterKey.Entities.Text) as? String {
-            prefixAloneOrPrefixedMention = mention.prependPrefixIfAbsent(prefix)
+        if let mention = data?.value(forKeyPath: Tweet.TwitterKey.Entities.Text) as? String {
+            prefixAloneOrPrefixedMention = mention.prependPrefixIfAbsent(prefix: prefix)
         }
         let expectedRange = NSRange(location: start, length: end - start)
         guard
-            let nsrange = text.rangeOfSubstringWithPrefix(prefixAloneOrPrefixedMention, expectedRange: expectedRange)
+            let nsrange = text.rangeOfSubstringWithPrefix(prefix: prefixAloneOrPrefixedMention, expectedRange: expectedRange)
             else {
                 return nil
         }
         
-        self.keyword = text.substringWithRange(nsrange)
+        self.keyword = text.substring(with: nsrange)
         self.nsrange = nsrange
     }
 }
 
-private let twitterDateFormatter: NSDateFormatter = {
-    let formatter = NSDateFormatter()
+private let twitterDateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
     formatter.dateFormat = "EEE MMM dd HH:mm:ss Z yyyy"
-    formatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+    formatter.locale = NSLocale(localeIdentifier: "en_US_POSIX") as Locale!
     return formatter
 }()
 
 private extension String {
     var asTwitterDate: NSDate? {
-        return twitterDateFormatter.dateFromString(self)
+        return twitterDateFormatter.date(from: self) as NSDate?
     }
 }
 
 private extension NSDictionary {
     func arrayForKeyPath(keypath: String) -> NSArray? {
-        return self.valueForKeyPath(keypath) as? NSArray
+        return self.value(forKeyPath: keypath) as? NSArray
     }
 }
 
@@ -155,8 +155,8 @@ private extension NSString
     {
         var offset = 0
         var substringRange = expectedRange
-        while range.contains(substringRange) && substringRange.intersects(expectedRange) {
-            if substringWithRange(substringRange).hasPrefix(prefix) {
+        while range.contains(range: substringRange) && substringRange.intersects(range: expectedRange) {
+            if substring(with: substringRange).hasPrefix(prefix) {
                 return substringRange
             }
             offset = offset > 0 ? -(offset+1) : -(offset-1)
@@ -171,8 +171,8 @@ private extension NSString
         var bestMatchRange = NSRange.NotFound
         var bestMatchDistance = Int.max
         repeat {
-            substringRange = rangeOfString(prefix, options: [], range: searchRange)
-            let distance = substringRange.distanceFrom(expectedRange)
+            substringRange = range(of: prefix, options: [], range: searchRange)
+            let distance = substringRange.distanceFrom(range: expectedRange)
             if distance < bestMatchDistance {
                 bestMatchRange = substringRange
                 bestMatchDistance = distance
@@ -183,7 +183,7 @@ private extension NSString
         
         if bestMatchRange.location != NSNotFound {
             bestMatchRange.length = expectedRange.length
-            if range.contains(bestMatchRange) {
+            if range.contains(range: bestMatchRange) {
                 return bestMatchRange
             }
         }
@@ -213,7 +213,7 @@ private extension NSRange
     func distanceFrom(range: NSRange) -> Int {
         if range.location == NSNotFound || location == NSNotFound {
             return Int.max
-        } else if intersects(range) {
+        } else if intersects(range: range) {
             return 0
         } else {
             return (end < range.start) ? range.start - end : start - range.end

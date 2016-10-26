@@ -24,7 +24,7 @@ class HistoryViewController: UIViewController {
         tableView.estimatedRowHeight = tableView.rowHeight
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         refreshHistory()
     }
 
@@ -42,21 +42,32 @@ class HistoryViewController: UIViewController {
     
     func refreshHistory(){
         
-        if let searches = NSUserDefaults.standardUserDefaults().arrayForKey(SearchHistoryKey) as? [String] {
+        if let searches = UserDefaults.standard.array(forKey: SearchHistoryKey) as? [String] {
             searchHistory = searches
         }
     }
     
-    
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "FromHistoryToDetail" {
-            if let cell = sender as? HistoryTableViewCell, tweetTableViewController = segue.destinationViewController as? TweetTableViewController{
-                print("segue to detail view from history...")
-                tweetTableViewController.searchText = cell.searchHistoryText
-            }
-            
-        }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let identifier = segue.identifier!
         
+        switch identifier{
+        case "FromHistoryToDetail":
+            if let cell = sender as? HistoryTableViewCell{
+                if let tweetTableViewController = segue.destination as? TweetTableViewController{
+                    print("segue to detail view from history...")
+                    tweetTableViewController.searchText = cell.searchHistoryText
+                }
+            }
+        case "AccessoryToPopularity":
+            if let cell = sender as? HistoryTableViewCell {
+                if let popularityTableViewController = segue.destination as? PopularityTableViewController {
+                    print("Segueing to popularity view...")
+                    popularityTableViewController.mention = cell.searchTextLabel.text
+                }
+            }
+        default:
+            return
+        }
     }
 
 }
@@ -64,7 +75,7 @@ class HistoryViewController: UIViewController {
 
 extension HistoryViewController: UITableViewDelegate {
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return searchHistory.count
     }
     
@@ -72,8 +83,8 @@ extension HistoryViewController: UITableViewDelegate {
 
 extension HistoryViewController: UITableViewDataSource {
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("HistoryCell", forIndexPath: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "HistoryCell", for: indexPath)
         
         if let historyCell = cell as? HistoryTableViewCell{
             historyCell.searchHistoryText = searchHistory[indexPath.row]

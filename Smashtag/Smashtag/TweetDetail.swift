@@ -75,23 +75,23 @@ func attributedStringFromTweet(tweet: Twitter.Tweet) -> NSAttributedString {
     let attributedString = NSMutableAttributedString(string: tweet.text)
     let fullString = tweet.text as NSString
     
-    let hashtagAttributes = [NSForegroundColorAttributeName: UIColor.greenColor()]
-    let urlAttributes = [NSForegroundColorAttributeName: UIColor.blueColor()]
-    let userAttributes = [NSForegroundColorAttributeName: UIColor.orangeColor()]
+    let hashtagAttributes = [NSForegroundColorAttributeName: UIColor.green]
+    let urlAttributes = [NSForegroundColorAttributeName: UIColor.blue]
+    let userAttributes = [NSForegroundColorAttributeName: UIColor.orange]
     
     // Turn the hashtags red
     for hashtag in tweet.hashtags {
-        let charRange = fullString.rangeOfString(hashtag.keyword)
+        let charRange = fullString.range(of: hashtag.keyword)
         attributedString.addAttributes(hashtagAttributes, range: charRange)
     }
     
     for url in tweet.urls {
-        let charRange = fullString.rangeOfString(url.keyword)
+        let charRange = fullString.range(of: url.keyword)
         attributedString.addAttributes(urlAttributes, range: charRange)
     }
     
     for userMention in tweet.userMentions {
-        let charRange = fullString.rangeOfString(userMention.keyword)
+        let charRange = fullString.range(of: userMention.keyword)
         attributedString.addAttributes(userAttributes, range: charRange)
     }
     

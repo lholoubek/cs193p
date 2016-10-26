@@ -59,7 +59,7 @@ public class Request: NSObject
     // convenience "fetch" for when self is a request that returns Tweet(s)
     // handler is not necessarily invoked on the main queue
     
-    public func fetchTweets(handler: ([Tweet]) -> Void) {
+    public func fetchTweets(handler: @escaping ([Tweet]) -> Void) {
         fetch { results in
             var tweets = [Tweet]()
             var tweetArray: NSArray?
@@ -89,8 +89,8 @@ public class Request: NSObject
     // calls the handler (not necessarily on the main queue)
     //   with the JSON results converted to a Property List
     
-    public func fetch(handler: (results: PropertyList?) -> Void) {
-        performTwitterRequest(SLRequestMethod.GET, handler: handler)
+    public func fetch(handler: @escaping (_ results: PropertyList?) -> Void) {
+        performTwitterRequest(method: SLRequestMethod.GET, handler: handler)
     }
     
     // generates a request for older Tweets than were returned by self
@@ -129,62 +129,62 @@ public class Request: NSObject
     // then calls the other version of this method that takes an SLRequest
     // handler is not necessarily called on the main queue
     
-    func performTwitterRequest(method: SLRequestMethod, handler: (PropertyList?) -> Void) {
-        let jsonExtension = (self.requestType.rangeOfString(Constants.JSONExtension) == nil) ? Constants.JSONExtension : ""
+    func performTwitterRequest(method: SLRequestMethod, handler: @escaping (PropertyList?) -> Void) {
+        let jsonExtension = (self.requestType.range(of: Constants.JSONExtension) == nil) ? Constants.JSONExtension : ""
         let request = SLRequest(
             forServiceType: SLServiceTypeTwitter,
             requestMethod: method,
-            URL: NSURL(string: "\(Constants.TwitterURLPrefix)\(self.requestType)\(jsonExtension)"),
+            url: URL(string: "\(Constants.TwitterURLPrefix)\(self.requestType)\(jsonExtension)"),
             parameters: self.parameters
         )
-        performTwitterSLRequest(request, handler: handler)
+        performTwitterSLRequest(request: request!, handler: handler)
     }
     
     // sends the request to Twitter
     // unpackages the JSON response into a Property List
     // and calls handler (not necessarily on the main queue)
     
-    func performTwitterSLRequest(request: SLRequest, handler: (PropertyList?) -> Void) {
+    func performTwitterSLRequest(request: SLRequest, handler: @escaping (PropertyList?) -> Void) {
         if let account = twitterAccount {
             request.account = account
-            request.performRequestWithHandler { (jsonResponse, httpResponse, _) in
+            request.perform { (jsonResponse, httpResponse, _) in
                 var propertyListResponse: PropertyList?
                 if jsonResponse != nil {
-                    propertyListResponse = try? NSJSONSerialization.JSONObjectWithData(
-                        jsonResponse,
-                        options: NSJSONReadingOptions.MutableLeaves)
+                    propertyListResponse = try! JSONSerialization.jsonObject(
+                        with: jsonResponse!,
+                        options: JSONSerialization.ReadingOptions.mutableLeaves) as Request.PropertyList?
                     if propertyListResponse == nil {
                         let error = "Couldn't parse JSON response."
-                        self.log(error)
-                        propertyListResponse = error
+                        self.log(whatToLog: error as AnyObject)
+                        propertyListResponse = error as Request.PropertyList?
                     }
                 } else {
                     let error = "No response from Twitter."
-                    self.log(error)
-                    propertyListResponse = error
+                    self.log(whatToLog: error as AnyObject)
+                    propertyListResponse = error as Request.PropertyList?
                 }
                 self.synchronize {
-                    self.captureFollowonRequestInfo(propertyListResponse)
+                    self.captureFollowonRequestInfo(propertyListResponse: propertyListResponse)
                 }
                 handler(propertyListResponse)
             }
         } else {
             let accountStore = ACAccountStore()
-            let twitterAccountType = accountStore.accountTypeWithAccountTypeIdentifier(ACAccountTypeIdentifierTwitter)
-            accountStore.requestAccessToAccountsWithType(twitterAccountType, options: nil) { (granted, _) in
+            let twitterAccountType = accountStore.accountType(withAccountTypeIdentifier: ACAccountTypeIdentifierTwitter)
+            accountStore.requestAccessToAccounts(with: twitterAccountType, options: nil) { (granted, _) in
                 if granted {
-                    if let account = accountStore.accountsWithAccountType(twitterAccountType)?.last as? ACAccount {
+                    if let account = accountStore.accounts(with: twitterAccountType)?.last as? ACAccount {
                         twitterAccount = account
-                        self.performTwitterSLRequest(request, handler: handler)
+                        self.performTwitterSLRequest(request: request, handler: handler)
                     } else {
                         let error = "Couldn't discover Twitter account type."
-                        self.log(error)
-                        handler(error)
+                        self.log(whatToLog: error as AnyObject)
+                        handler(error as Request.PropertyList?)
                     }
                 } else {
                     let error = "Access to Twitter was not granted."
-                    self.log(error)
-                    handler(error)
+                    self.log(whatToLog: error as AnyObject)
+                    handler(error as Request.PropertyList?)
                 }
             }
         }
@@ -209,11 +209,11 @@ public class Request: NSObject
     
     private func captureFollowonRequestInfo(propertyListResponse: PropertyList?) {
         if let responseDictionary = propertyListResponse as? NSDictionary {
-            self.max_id = responseDictionary.valueForKeyPath(TwitterKey.SearchMetadata.MaxID) as? String
-            if let next_results = responseDictionary.valueForKeyPath(TwitterKey.SearchMetadata.NextResults) as? String {
-                for queryTerm in next_results.componentsSeparatedByString(TwitterKey.SearchMetadata.Separator) {
+            self.max_id = responseDictionary.value(forKeyPath: TwitterKey.SearchMetadata.MaxID) as? String
+            if let next_results = responseDictionary.value(forKeyPath: TwitterKey.SearchMetadata.NextResults) as? String {
+                for queryTerm in next_results.components(separatedBy: TwitterKey.SearchMetadata.Separator) {
                     if queryTerm.hasPrefix("?\(TwitterKey.MaxID)=") {
-                        let next_id = queryTerm.componentsSeparatedByString("=")
+                        let next_id = queryTerm.components(separatedBy: "=")
                         if next_id.count == 2 {
                             self.min_id = next_id[1]
                         }

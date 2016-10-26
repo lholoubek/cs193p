@@ -22,9 +22,9 @@ public class MediaItem: NSObject
     
     init?(data: NSDictionary?) {
         guard
-            let height = data?.valueForKeyPath(TwitterKey.Height) as? Double where height > 0,
-            let width = data?.valueForKeyPath(TwitterKey.Width) as? Double where width > 0,
-            let urlString = data?.valueForKeyPath(TwitterKey.MediaURL) as? String,
+            let height = data?.value(forKeyPath: TwitterKey.Height) as? Double , height > 0,
+            let width = data?.value(forKeyPath: TwitterKey.Width) as? Double , width > 0,
+            let urlString = data?.value(forKeyPath: TwitterKey.MediaURL) as? String,
             let url = NSURL(string: urlString)
         else {
             return nil
