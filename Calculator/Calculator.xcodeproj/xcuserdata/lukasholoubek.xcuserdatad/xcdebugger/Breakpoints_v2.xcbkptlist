@@ -15,7 +15,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "35"
             endingLineNumber = "35"
-            landmarkName = "drawRect(_:)"
+            landmarkName = "drawRect(rect:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -31,7 +31,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "37"
             endingLineNumber = "37"
-            landmarkName = "drawRect(_:)"
+            landmarkName = "drawRect(rect:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -47,7 +47,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "93"
             endingLineNumber = "93"
-            landmarkName = "getYPointFromPixel(_:origin:)"
+            landmarkName = "getYPointFromPixel(pixel:origin:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -63,7 +63,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "103"
             endingLineNumber = "103"
-            landmarkName = "getYPointFromPixel(_:origin:)"
+            landmarkName = "getYPointFromPixel(pixel:origin:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
