@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7F8E33F11DE0EC99007CF86B /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8E33F01DE0EC99007CF86B /* SettingsManager.swift */; };
 		7FF99CFE1DCFD7560065E4CE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF99CFD1DCFD7560065E4CE /* AppDelegate.swift */; };
 		7FF99D031DCFD7560065E4CE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7FF99D011DCFD7560065E4CE /* Main.storyboard */; };
 		7FF99D051DCFD7560065E4CE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7FF99D041DCFD7560065E4CE /* Assets.xcassets */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7F8E33F01DE0EC99007CF86B /* SettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
 		7FF99CFA1DCFD7560065E4CE /* breakout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breakout.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FF99CFD1DCFD7560065E4CE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7FF99D021DCFD7560065E4CE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 				7FF99D131DCFEFBC0065E4CE /* GameView.swift */,
 				7FF99D151DCFEFCC0065E4CE /* BrickSmasherView.swift */,
 				7FF99D111DCFEF9F0065E4CE /* GameViewController.swift */,
+				7F8E33F01DE0EC99007CF86B /* SettingsManager.swift */,
 				7FF99D011DCFD7560065E4CE /* Main.storyboard */,
 				7FF99D171DCFF4090065E4CE /* PaddleView.swift */,
 				7FF99D041DCFD7560065E4CE /* Assets.xcassets */,
@@ -155,6 +158,7 @@
 				7FF99D181DCFF4090065E4CE /* PaddleView.swift in Sources */,
 				7FF99D161DCFEFCC0065E4CE /* BrickSmasherView.swift in Sources */,
 				7FF99D141DCFEFBC0065E4CE /* GameView.swift in Sources */,
+				7F8E33F11DE0EC99007CF86B /* SettingsManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

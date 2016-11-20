@@ -9,13 +9,17 @@
 import UIKit
 
 class GameView: UIView {
-
-    // This view displays the breakout game
     
-    func setUpGame(gameSettings: GameSettings){
-        layoutBlocks(numBlocks: gameSettings.numberOfBlocks)
+    // Keeping track of all of the blockviews in a separate array so we can remove them later as the block count gets adjusted
+    var blockViews = [UIView]()
+    
+    func setUpGame(numBlocks: Int){
+        for block in blockViews{
+            block.removeFromSuperview()
+        }
+        
+        layoutBlocks(numBlocks: numBlocks)
     }
-    
     
     private func layoutBlocks(numBlocks: Int){
         // lays out the grid of blocks using the number passed
@@ -33,7 +37,6 @@ class GameView: UIView {
         
     }
     
-    
     private func layoutBlockRow(rowNum: Int, numBlocks: Int){
         // creates views and adds them for each block in the row
         
@@ -45,18 +48,15 @@ class GameView: UIView {
         let blockSize = CGSize(width: viewWidth, height: viewHeight)
         
         for block in 0..<numBlocks {
-            
             let widthOffset = CGFloat(0.05) * blockWidth
-            
             let xOrigin = (blockWidth * CGFloat(block)) + widthOffset
             let yOrigin = blockHeight * CGFloat(0.1) + (blockHeight * CGFloat(rowNum))
             let origin = CGPoint(x: xOrigin, y: yOrigin)
-            print("origin: \(origin)")
-            
             let frame = CGRect(origin: origin, size: blockSize)
             let blockView = UIView(frame: frame)
             blockView.backgroundColor = UIColor.blue
             addSubview(blockView)
+            blockViews.append(blockView)
         }
         
     }
