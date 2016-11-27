@@ -8,14 +8,11 @@
 
 import Foundation
 
-//Struct to handle current game settings
-
-enum GameDifficulty {
-    case easy
-    case medium
-    case hard
+enum BallSpeed: Double {
+    case fast = 0.14
+    case medium = 0.08
+    case slow = 0.05
 }
-
 
 class SettingsManager {
     
@@ -23,19 +20,19 @@ class SettingsManager {
     
     var gameInProgress = false
     
-    var difficultyLevel:GameDifficulty = .easy
+    var ballSpeed: BallSpeed = .slow
     
     var numBlocks = 25
     
     var useTilt = false
     
-    var bounciness: Double = 0.0
+    var randomness: Int = 15
     
     func resetDefaults() {
-        difficultyLevel = .easy
+        ballSpeed = .slow
         numBlocks = 25
         useTilt = false
-        bounciness = 0.5
+        randomness = 0
     }
     
 }

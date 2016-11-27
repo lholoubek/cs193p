@@ -38,7 +38,7 @@ class SettingsViewController: UITableViewController {
 
     @IBOutlet weak var bounceSlider: UISlider!{
         didSet {
-            bounceSlider.value = Float(settingsManager.bounciness)
+            bounceSlider.value = Float(settingsManager.randomness)
         }
     }
     
@@ -47,13 +47,13 @@ class SettingsViewController: UITableViewController {
         switch sender.selectedSegmentIndex {
             case 0:
                 print("set To Easy")
-                settingsManager.difficultyLevel = .easy
+                settingsManager.ballSpeed = .slow
             case 1:
                 print("set to medium")
-                settingsManager.difficultyLevel = .medium
+                settingsManager.ballSpeed = .medium
             case 2:
                 print("set to hard")
-            settingsManager.difficultyLevel = .hard
+            settingsManager.ballSpeed = .fast
         default:
             break
         }
@@ -71,20 +71,21 @@ class SettingsViewController: UITableViewController {
     }
     
     @IBAction func handleBouncySliderUpdate(_ sender: UISlider){
-        print(sender.value)
-        
+        settingsManager.randomness = Int(sender.value)
     }
     
     @IBAction func handleResetDefaults(_ sender: UIButton){
+        resetSettings()
+    }
+    
+    private func resetSettings(){
         settingsManager.resetDefaults()
-        difficultySelector.selectedSegmentIndex = settingsManager.difficultyLevel.hashValue
+        difficultySelector.selectedSegmentIndex = settingsManager.ballSpeed.hashValue
         tiltControlSwitch.isOn = settingsManager.useTilt
         cellStepper.value = Double(settingsManager.numBlocks)
         updateBlockCount()
-        bounceSlider.value = Float(settingsManager.bounciness)
-    
-    }
-    
+        bounceSlider.value = Float(settingsManager.randomness)
+    }    
     
     // MARK: Viewcontroller lifecycle
     override func viewDidLoad() {
